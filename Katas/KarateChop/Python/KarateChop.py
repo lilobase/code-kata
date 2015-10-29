@@ -12,10 +12,7 @@ def chop(find, array, index_to=0):
     if len(array) == 0: return -1
 
     if len(array) == 1:
-        if array[0] == find:
-            return index_to
-        else:
-            return -1
+        return index_to if array[0] == find else -1
 
     sub_index_to, sub_array = sub_chop(find, array)
 
