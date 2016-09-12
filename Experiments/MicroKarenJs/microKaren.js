@@ -39,7 +39,6 @@ const or = (f, g) => (subset) => [...f(subset), ...g(subset)];
 const unify = (t1, t2, subset) => {
     t1 = extract(t1, subset);
     t2 = extract(t2, subset);
-    console.log("unification:", t1,' | ', t2, ' | ', subset);
     return (
         t1 === t2 ? subset :
         t1 instanceof LogicVar ? extendSubset(t1, t2, subset) :
@@ -67,7 +66,6 @@ describe('microKaren', () => {
     });
 
     it('finds a single value by a = b = c', () => {
-        console.log(' ====== finds a single value ===== ');
         const lvar_a = lvar('a');
         const lvar_b = lvar('b');
         const rules = and(equal(lvar_a, lvar_b), equal(lvar_b, 5));
@@ -77,7 +75,6 @@ describe('microKaren', () => {
     });
 
     it('finds two values', () => {
-        console.log(' ====== finds two values ===== ');
         const lvar_a = lvar('a');
         const rules = or(equal(lvar_a, 5), equal(lvar_a, 3));
         expect(
@@ -86,7 +83,6 @@ describe('microKaren', () => {
     });
 
     it('finds two sets of solutions', () => {
-        console.log(' ====== find two sets of solutions ===== ');
         const lvar_a = lvar('a');
         const lvar_b = lvar('b');
         const rules = and(equal(lvar_a, 7), or(equal(lvar_b, 3), equal(lvar_b, 5)));
@@ -106,16 +102,9 @@ describe('microKaren', () => {
     };
 
     it('finds the grandfather', () => {
-        console.log(' ====== finds the father ===== ');
-        const rules =
         expect(
             run(grandfather(lvar('grandfather'), lvar('grandchildren')))
         ).toEqual([{ grandfather: 'mcbob', father: 'bob', grandchildren: 'bill' }]);
-
-    });
-
-    it('finds the grandfather', () => {
-        console.log(' ====== finds the grandfather ===== ');
 
     });
 
