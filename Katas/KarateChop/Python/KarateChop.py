@@ -19,7 +19,7 @@ def chop(find, array, index_to=0):
     return chop(find, sub_array, index_to + sub_index_to)
 
 
-def test_it_is_not_in_the_array():
+def test_it_is_not_in_an_empty_array():
     assert chop(3, []) == -1
     assert chop(3, []) == -1
 
