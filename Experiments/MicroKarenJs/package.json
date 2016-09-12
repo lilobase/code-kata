@@ -1,0 +1,14 @@
+{
+  "name": "microkaren",
+  "version": "1.0.0",
+  "description": "",
+  "main": "microKaren.js",
+  "scripts": {
+    "test": ""
+  },
+  "author": "Arnaud LEMAIRE <alemaire@quantis.fr> (www.ibsciss.com)",
+  "license": "ISC",
+  "dependencies": {
+    "jasmine-es6": "^0.3.1"
+  }
+}
