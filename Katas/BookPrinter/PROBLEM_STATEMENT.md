@@ -1,0 +1,1 @@
+A book has been printed with 168 time the number 1 in its pages number, How many pages does the book has. 

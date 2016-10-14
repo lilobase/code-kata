@@ -1,0 +1,2 @@
+const count_number_of_1_in_n = n => n.toString().split(1).length - 1;
+const count_number_of_1 = (index = 1, acc = 1) => (acc == 168) ? index : count_number_of_1(index + 1, acc+count_number_of_1_in_n(index));
