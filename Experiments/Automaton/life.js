@@ -1,7 +1,7 @@
 const {multirec, mapWith, isOneByOneArray, divideSquareIntoRegions, contentsOfOneByOneArray, itself, isString, quadTreeToRegions, regionsToRotateQuadTree, quadTreeToArray} = module.require('./recursive_data_structure');
 
-const W = '⚪️';
-const B = '⚫️';
+const W = '⚪';
+const B = '⚫';
 
 const memoized = (fn, keymaker = JSON.stringify) => {
     const lookupTable = new Map();
@@ -69,7 +69,6 @@ const sq = arrayToQuadTree([
 ]);
 
 
-
 const neighboursOfUlLr = (square) => [
     square.ul.ul, square.ul.ur, square.ur.ul, square.ur.ll,
     square.lr.ul, square.ll.ur, square.ll.ul, square.ul.ll
@@ -109,10 +108,10 @@ const averageOf4x4 = (sq) => quadtree(
 /*
 const averaged = averageOf4x4(
     arrayToQuadTree([
-        ['⚫️', '⚪️', '⚪️', '⚪️'],
-        ['⚪️', '⚫️', '⚫️', '⚪️'],
-        ['⚪️', '⚫️', '⚪️', '⚫️'],
-        ['⚫️', '⚪️', '⚫️', '⚪️']
+        ['⚫', '⚪', '⚪', '⚪'],
+        ['⚪', '⚫', '⚫', '⚪'],
+        ['⚪', '⚫', '⚪', '⚫'],
+        ['⚫', '⚪', '⚫', '⚪']
     ])
 );
 */
@@ -205,17 +204,123 @@ const average = memoizedDoubleMultirec({
 });
 
 const eightByEight = arrayToQuadTree([
-    ['⚫️', '⚪️', '⚪️', '⚫️', '⚫️', '⚪️', '⚪️', '⚪️'],
-    ['⚪️', '⚫️', '⚫️', '⚪️', '⚪️', '⚫️', '⚫️', '⚪️'],
-    ['⚪️', '⚫️', '⚪️', '⚫️', '⚪️', '⚫️', '⚪️', '⚫️'],
-    ['⚪️', '⚪️', '⚫️', '⚪️', '⚫️', '⚪️', '⚫️', '⚪️'],
-    ['⚪️', '⚫️', '⚪️', '⚪️', '⚪️', '⚫️', '⚪️', '⚫️'],
-    ['⚫️', '⚪️', '⚫️', '⚪️', '⚫️', '⚪️', '⚫️', '⚪️'],
-    ['⚪️', '⚫️', '⚫️', '⚪️', '⚪️', '⚫️', '⚫️', '⚪️'],
-    ['⚫️', '⚪️', '⚪️', '⚫️', '⚪️', '⚪️', '⚪️', '⚫️']
+    ['⚫', '⚪', '⚪', '⚫', '⚫', '⚪', '⚪', '⚪'],
+    ['⚪', '⚫', '⚫', '⚪', '⚪', '⚫', '⚫', '⚪'],
+    ['⚪', '⚫', '⚪', '⚫', '⚪', '⚫', '⚪', '⚫'],
+    ['⚪', '⚪', '⚫', '⚪', '⚫', '⚪', '⚫', '⚪'],
+    ['⚪', '⚫', '⚪', '⚪', '⚪', '⚫', '⚪', '⚫'],
+    ['⚫', '⚪', '⚫', '⚪', '⚫', '⚪', '⚫', '⚪'],
+    ['⚪', '⚫', '⚫', '⚪', '⚪', '⚫', '⚫', '⚪'],
+    ['⚫', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚫']
 ]);
 
+const fourByFour = arrayToQuadTree([
+    ['⚫', '⚪', '⚪', '⚪'],
+    ['⚪', '⚫', '⚫', '⚪'],
+    ['⚪', '⚫', '⚪', '⚫'],
+    ['⚫', '⚪', '⚫', '⚪']
+]);
 
-const arrays = quadTreeToArray(average(eightByEight));
+const is2x2 = square => isString(square.ul);
 
-console.log(arrays);
+const divideQuadTreeIntoRegion = ({ul, ur, lr, ll}) => [ul, ur, lr, ll];
+
+const blank4x4 = quadtree(W, W, W, W);
+
+const blankCopy = memoizedMultiRec({
+    indivisible: is2x2,
+    value: () => blank4x4,
+    divide: divideQuadTreeIntoRegion,
+    combine: regionsToQuadTree
+});
+
+const double = square => {
+    const padding = blankCopy(square.ul);
+    const ul = quadtree(padding, padding, square.ul, padding);
+    const ur = quadtree(padding, padding, padding, square.ur);
+    const lr = quadtree(square.lr, padding, padding, padding);
+    const ll = quadtree(padding, square.ll, padding, padding);
+
+    return quadtree(ul, ur, lr, ll);
+};
+
+/*
+const averagedPixel = (pixel, blackNeighbours) => (pixel === W)
+    ? BP.includes(blackNeighbours) ? B : W
+    : WP.includes(blackNeighbours) ? B : W;
+
+const averageOf4x4 = (sq) => quadtree(
+    averagedPixel(sq.ul.lr, countNeighbouringBlack(neighboursOfUlLr(sq))),
+    averagedPixel(sq.ur.ll, countNeighbouringBlack(neighboursOfUrLl(sq))),
+    averagedPixel(sq.lr.ul, countNeighbouringBlack(neighboursOfLrUl(sq))),
+    averagedPixel(sq.ll.ur, countNeighbouringBlack(neighboursOfLlUr(sq)))
+);
+*/
+
+function automaton({Br, Sr}) {
+    const applyRuleToCell = (pixel, blackNeighbours) => (pixel === W) ?
+        Br.includes(blackNeighbours) ? B : W :
+        Sr.includes(blackNeighbours) ? B : W;
+
+    const applyRuleTo4x4 = (sq) => quadtree(
+        applyRuleToCell(sq.ul.lr, countNeighbouringBlack(neighboursOfUlLr(sq))),
+        applyRuleToCell(sq.ur.ll, countNeighbouringBlack(neighboursOfUrLl(sq))),
+        applyRuleToCell(sq.lr.ul, countNeighbouringBlack(neighboursOfLrUl(sq))),
+        applyRuleToCell(sq.ll.ur, countNeighbouringBlack(neighboursOfLlUr(sq)))
+    );
+
+    return memoizedDoubleMultirec({
+        indivisible: is4x4,
+        value: applyRuleTo4x4,
+        divide: divideQuadtreeIntoNine,
+        subcombine: combineNineIntoNonetTree,
+        subdivide: divideNonetTreeIntoQuadTrees,
+        combine: regionsToQuadTree
+    })
+}
+
+const averageAutomaton = automaton({Br: [5, 6, 7, 8], Sr: [4, 5, 6, 7, 8]});
+
+const conwaysGameOfLife = automaton({Br: [3], Sr: [2, 3]});
+
+
+const automatonOut = quadTreeToArray(conwaysGameOfLife(double(eightByEight)));
+
+const origin1 = arrayToQuadTree([
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚫', '⚫', '⚫', '⚪', '⚪'],
+    ['⚪', '⚪', '⚫', '⚫', '⚫', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪']
+]);
+
+const origin = arrayToQuadTree([
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚫', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ['⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪', '⚪'],
+    ]);
+
+let currentGen = double(origin);
+setInterval(() => {
+    console.clear();
+    let display = quadTreeToArray(currentGen).map(item => item.join(" ")).join("\n");
+    console.log(display);
+    console.log("\n");
+    currentGen = conwaysGameOfLife(double(currentGen));
+}, 1000);
